@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
 
+import Local from './helpers/Local';
+import Api from './helpers/Api';
+
 import Navbar from './components/Navbar';
 import HomeView from './views/HomeView';
 import GetMealView from './views/GetMealView';
@@ -9,172 +12,229 @@ import GridView from './views/GridView';
 import RecipeDetailView from './views/RecipeDetailView';
 import MyFavoritesView from './views/MyFavoritesView';
 import Error404View from './views/Error404View';
+import PrivateRoute from './components/PrivateRoute';
+import LoginView from './views/LoginView';
+import SignUpView from './views/SignUpView';
+import UsersView from './views/UsersView';
 
 let BASE_URL = `https://api.spoonacular.com/recipes`;
 const API_KEY = process.env.REACT_APP_MY_API_KEY;
 
 function App() {
-    const [recipes, setRecipes] = useState([]);
-    const [recipeInfo, setRecipeInfo] = useState(null);
-    const [myFavorites, setFavorites] = useState([]);
-    const navigate = useNavigate();
-    const [error, setError] = useState("");
-  
-// calling Spoonacular API to get recipes based on ingredients from input
-    async function getRecipes(ingredients) {
-      setError("");
-      setRecipes(null);
-  
-      const options = {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-       }
+  const [recipes, setRecipes] = useState([]);
+  const [recipeInfo, setRecipeInfo] = useState(null);
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [user, setUser] = useState(Local.getUser());
+  const [loginErrorMsg, setLoginErrorMsg] = useState('');
 
-      let url = `${BASE_URL}/findByIngredients?apiKey=${API_KEY}&ingredients=${ingredients}&number=20&ranking=1&ignorePantry=true`
-
-      try {
-        let response = await fetch(url, options);
-        if (response.ok) {
-          let data = await response.json();
-          setRecipes(data);
-        } else {
-          setError(`Server error: ${response.status} ${response.statusText}`);
-        }
-      } catch (err) {
-        setError(`Network error: ${err.message}`);
-      }
-      navigate('/recipes');  // redirect to /recipes
-    }
-
-
-// calling Spoonacular API to get info about one recipe based on its id (after click on See detail in RecipesGrid or in MyFavoritesView)
-    async function getRecipeInfo(id) {
-      setError("");
-      setRecipeInfo(null);
-  
-      const options = {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-       }
-
-      let url = `${BASE_URL}/${id}/information?apiKey=${API_KEY}`
-
-      try {
-        let response = await fetch(url, options);
-        if (response.ok) {
-          let data = await response.json();
-          setRecipeInfo(data);
-        } else {
-          setError(`Server error: ${response.status} ${response.statusText}`);
-        }
-      } catch (err) {
-        setError(`Network error: ${err.message}`);
-      }
-    
-    }
-
-
-// POST method to add recipe to my sql database ("favorites" sql table) after click on Add to Favorites in the RecipeDetailView
-    async function addToFavorites(id) { 
-
-      let myFavRecipe = {
-        recipe_id: id,
-        recipe_title: recipeInfo.title,
-        recipe_img: recipeInfo.image,
-      }
-      
-      let options = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(myFavRecipe)
-      };
-  
-      try {
-        let response = await fetch("/favorites", options); //post the new recipe to my favorites ("favories" sql table)
-        console.log(options)
-        if (response.ok) {
-          let data = await response.json();
-          setFavorites(data);
-        } else {
-          console.log(`Server error: ${response.status} ${response.statusText}`);
-        }
-      } catch (err) {
-        console.log(`Network error: ${err.message}`);
-      }
-    }
-
-    useEffect(() => {
-      getFavorites();  
-  }, []);
-
-
-// GET method to show all the favorites from my "favorites" sql table after clicking on My Favorites (MyFavoritesView)
-    async function getFavorites() {
-      try {
-          let response = await fetch('/favorites'); //get all favorites
-          if (response.ok) {
-              let favorites = await response.json();
-              setFavorites(favorites);
-          } else {
-              console.log(`Server error: ${response.status} ${response.statusText}`);
-          }
-      } catch (err) {
-          console.log(`Server error: ${err.message}`);
-      }
-  }
-
-
-  // DELETE method to delete recipe from "favorites" table & "MyFavoritesView" after clicking on Delete in My Favorites (MyFavoritesView)
-  async function deleteFromFavorites(id) {
+  // POST method to add recipe to my sql database ("favorites" sql table) after click on Add to Favorites in the RecipeDetailView
+  async function addUser(userData) {
+    // Define fetch() options
     let options = {
-        method: 'DELETE'
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
     };
 
     try {
-        let response = await fetch(`/favorites/${id}`, options);  // delete the recipe with the given id
-        if (response.ok) {
-            let favorites = await response.json();
-            setFavorites(favorites); 
-        } else {
-            console.log(`Server error: ${response.status} ${response.statusText}`);
-        }
+      let response = await fetch('/register', options); // do POST
+      if (response.ok) {
+        await response.json();
+        navigate('/login');
+      } else {
+        console.log(`Server error: ${response.status} ${response.statusText}`);
+      }
     } catch (err) {
-        console.log(`Server error: ${err.message}`);
+      console.log(`Server error: ${err.message}`);
     }
-}
+  }
 
-    return (
-        <div className="App">
-            <Navbar getFavoritesCb={getFavorites}/>
+  async function doLogin(username, password) {
+    let myresponse = await Api.loginUser(username, password);
+    if (myresponse.ok) {
+      Local.saveUserInfo(myresponse.data.token, myresponse.data.user);
+      // setUser is async so use data from myresponse instead
+      navigate('/favorites/');
+      setUser(myresponse.data.user);
+      setLoginErrorMsg('');
+    } else {
+      setLoginErrorMsg('Login failed!');
+    }
+  }
 
-          <div className="container-fluid">
+  function doLogout() {
+    Local.removeUserInfo();
+    setUser(null);
+  }
 
-            {/* Routes to other Views of the app */}
-            <Routes>
-                {/* Route to HomeView */}
-                <Route path="/" element={<HomeView />} />
-                {/* Route to GetMealView with the IngredientsForm component*/}
-                <Route path="getmeal" element={<GetMealView getRecipesCb={getRecipes}/>} />
-                {/* Route to GridView with the RecipesGrid component*/}
-                <Route path="recipes" element={<GridView recipes={recipes} getRecipeInfoCb={getRecipeInfo} />} />
-                {/* Route to RecipeDetailView with the RecipeDetail component*/}
-                <Route path="recipes/:id"element={<RecipeDetailView recipeInfo={recipeInfo} addToFavoritesCb={addToFavorites}/>} />
-                {/* Route to MyFavoritesView*/}
-                <Route path="myfavorites" element={<MyFavoritesView myFavorites={myFavorites} deleteFromFavoritesCb={deleteFromFavorites} getRecipeInfoCb={getRecipeInfo}/>} />
-                {/* Route to ErrorView in case the users types invalid url */}
-                <Route path="*" element={<Error404View />} />
-            </Routes>
+  // calling Spoonacular API to get recipes based on ingredients from input
+  async function getRecipes(ingredients) {
+    setError('');
+    setRecipes(null);
 
-            {/* Show error message in case there is a problem with the fetch  */}
-            {error && <h2 style={{ color: "red" }}>{error}</h2>}
-         
-          </div>
-        </div>
-    );
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    let url = `${BASE_URL}/findByIngredients?apiKey=${API_KEY}&ingredients=${ingredients}&number=5&ranking=1&ignorePantry=true`;
+
+    try {
+      let response = await fetch(url, options);
+      if (response.ok) {
+        let data = await response.json();
+        setRecipes(data);
+      } else {
+        setError(`Server error: ${response.status} ${response.statusText}`);
+      }
+    } catch (err) {
+      setError(`Network error: ${err.message}`);
+    }
+    navigate('/recipes'); // redirect to /recipes
+  }
+
+  // calling Spoonacular API to get info about one recipe based on its id (after click on See detail in RecipesGrid or in MyFavoritesView)
+  async function getRecipeInfo(id) {
+    setError('');
+    setRecipeInfo(null);
+
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    let url = `${BASE_URL}/${id}/information?apiKey=${API_KEY}`;
+
+    try {
+      let response = await fetch(url, options);
+      if (response.ok) {
+        let data = await response.json();
+        setRecipeInfo(data);
+      } else {
+        setError(`Server error: ${response.status} ${response.statusText}`);
+      }
+    } catch (err) {
+      setError(`Network error: ${err.message}`);
+    }
+  }
+
+  // POST method to add recipe to my sql database ("favorites" sql table) after click on Add to Favorites in the RecipeDetailView
+  async function addToFavorites(id) {
+    let myFavRecipe = {
+      recipe_id: id,
+      recipe_title: recipeInfo.title,
+      recipe_img: recipeInfo.image,
+    };
+
+    let options = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(myFavRecipe),
+    };
+
+    try {
+      let response = await fetch(`/favorites/`, options); //post the new recipe to my favorites ("favories" sql table)
+      if (response.ok) {
+        // when favorite got added navigate to favorites page
+        navigate(`/favorites/`);
+      } else {
+        console.log(`Server error: ${response.status} ${response.statusText}`);
+      }
+    } catch (err) {
+      console.log(`Network error: ${err.message}`);
+    }
+  }
+
+  // DELETE method to delete recipe from "favorites" table & "MyFavoritesView" after clicking on Delete in My Favorites (MyFavoritesView)
+  async function deleteFromFavorites(recipeId) {
+    let options = {
+      method: 'DELETE',
+    };
+
+    try {
+      let response = await fetch(`/favorites/${recipeId}`, options); // delete the recipe with the given id
+      console.log(recipeId, response);
+      if (response.ok) {
+        let favorites = await response.json();
+        // setFavorites(favorites);
+      } else {
+        console.log(`Server error: ${response.status} ${response.statusText}`);
+      }
+    } catch (err) {
+      console.log(`Server error: ${err.message}`);
+    }
+  }
+
+  return (
+    <div className="App">
+      <Navbar logoutCb={doLogout} user={user} />
+
+      <div className="container-fluid">
+        {/* Routes to other Views of the app */}
+        <Routes>
+          {/* Route to HomeView */}
+          <Route path="/" element={<HomeView />} />
+          {/* Route to GetMealView with the IngredientsForm component*/}
+          <Route
+            path="getmeal"
+            element={<GetMealView getRecipesCb={getRecipes} />}
+          />
+          {/* Route to GridView with the RecipesGrid component*/}
+          <Route
+            path="recipes"
+            element={
+              <GridView recipes={recipes} getRecipeInfoCb={getRecipeInfo} />
+            }
+          />
+          {/* Route to RecipeDetailView with the RecipeDetail component*/}
+          <Route
+            path="recipes/:id"
+            element={
+              <RecipeDetailView
+                recipeInfo={recipeInfo}
+                user={user}
+                addToFavoritesCb={addToFavorites}
+              />
+            }
+          />
+          {/* Route to MyFavoritesView*/}
+          <Route
+            path="favorites/"
+            element={
+              <PrivateRoute>
+                <MyFavoritesView
+                  deleteFromFavoritesCb={deleteFromFavorites}
+                  getRecipeInfoCb={getRecipeInfo}
+                />
+              </PrivateRoute>
+            }
+          />
+          {/* Route to ErrorView in case the users types invalid url */}
+          <Route path="*" element={<Error404View />} />
+          <Route path="/" element={<h1>Home</h1>} />
+          <Route path="/users" element={<UsersView />} />
+          <Route
+            path="/login"
+            element={
+              <LoginView
+                loginCb={(u, p) => doLogin(u, p)}
+                loginError={loginErrorMsg}
+              />
+            }
+          />
+          <Route path="/signup" element={<SignUpView addUserCb={addUser} />} />
+        </Routes>
+
+        {/* Show error message in case there is a problem with the fetch  */}
+        {error && <h2 style={{ color: 'red' }}>{error}</h2>}
+      </div>
+    </div>
+  );
 }
 
 export default App;

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./IngredientsForm.css";
 
-
 function IngredientsForm(props) {
   const [ingredients, setIngredients] = useState("");
 
@@ -19,7 +18,7 @@ function IngredientsForm(props) {
   <div className="row">
     <div className="col sm-6 text-center">
       <form onSubmit={handleSubmit} className="form-group">
-        <label for="floatingInput">WHAT'S IN MY FRIDGE?
+        <label htmlFor="floatingInput">WHAT'S IN MY FRIDGE?
           <p className="text-center mt-5 fs-6 fw-light">Type your ingredients separated by comma</p>
           <input 
             className="form-control d-block p-3 mt-2 mw-200"

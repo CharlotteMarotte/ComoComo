@@ -7,7 +7,7 @@ function RecipeDetailView(props) {
     return (
         <div className="RecipeDetailView">
             {props.recipeInfo &&
-            <RecipeDetail recipeInfo={props.recipeInfo} addToFavoritesCb={props.addToFavoritesCb}  />}
+            <RecipeDetail recipeInfo={props.recipeInfo} addToFavoritesCb={props.addToFavoritesCb} user={props.user} />}
         </div>
     );
 }

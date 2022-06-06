@@ -12,7 +12,7 @@ function RecipesGrid(props) {
       {/* Grid of recipe cards */}
         {props.recipes.map(r => (
             <div className="col-sm-6 col-lg-3 mb-3 d-flex justify-content-evenly" key={r.id}>
-              <div className="card ms-2 text-center">
+              <div className="card ms-2 text-center" style={{width: "25rem"}}>
                 {/* Image of the recipe */}
                   <img className="card-img-top"
                           key={r.id}
