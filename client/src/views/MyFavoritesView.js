@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import Api from '../helpers/Api';
 
 function MyFavoritesView(props) {
@@ -38,15 +37,17 @@ function MyFavoritesView(props) {
       <div className="row">
         {/* Grid with recipe cards */}
         {user.favorites.map((f) => (
-          <div className="col-sm-6 col-lg-3 mb-3 d-flex justify-content-evenly">
+          <div
+            key={f.recipe_id}
+            className="col-sm-6 col-lg-3 mb-3 d-flex justify-content-evenly"
+          >
             <div className="card ms-2" style={{ width: '22rem' }}>
               {/* Recipe Image */}
               <img
                 className="card-img-top"
-                key={f.recipe_id}
                 id={f.recipe_id}
                 src={f.recipe_img}
-                alt="image of the meal"
+                alt="the meal"
               />
               {/* Recipe title */}
               <div className="card-body">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './RecipeDetail.css';
 import { Link } from 'react-router-dom';
 import Error404View from '../views/Error404View';
@@ -13,7 +13,7 @@ function RecipeDetail(props) {
       <div className="row">
         <div className="col text-center">
           {/* Recipe image */}
-          <img src={recipe.image} alt="image of the meal" />
+          <img src={recipe.image} alt="the meal" />
           <p></p>
           {
             //  Button Add to favorites - after click it calls the addToFavorites function which is adding the recipe to
@@ -46,7 +46,7 @@ function RecipeDetail(props) {
               <li key={d.name}>{d}</li>
             ))}
           </ul>
-          <h6>Ingredients & Instructions:</h6>{' '}
+          <h6>Ingredients {'&'} Instructions:</h6>{' '}
           {recipe.analyzedInstructions[0].steps.map((s) => {
             s.ingredients.map((i) => i.name);
           })}

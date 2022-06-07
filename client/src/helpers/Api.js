@@ -1,10 +1,9 @@
 import Local from './Local';
 
-
 /**
- * This is a helper class that places all "knowledge" about doing a fetch() in one place. 
+ * This is a helper class that places all "knowledge" about doing a fetch() in one place.
  * Any component that needs to do a fetch() will import this class and call the corresponding method.
- * 
+ *
  * All methods call the internal/private _doFetch() method, which does all the work. It returns
  * a "unified" myresponse obj that has four properties:
  *   ok: true if the server response is OK, false otherwise
@@ -13,85 +12,82 @@ import Local from './Local';
  *   error: the error message if there was either a server or network error, '' otherwise
  **/
 
-
 class Api {
+  /**
+   * Log in a user
+   **/
+
+  static async loginUser(username, password) {
+    let body = { username, password };
+
+    return await this._doFetch('/login', 'POST', body);
+  }
 
     /**
-     * Log in a user
-     **/
-    
-    static async loginUser(username, password) {
-        let body = { username, password };
+   * Add to favoritesfor user that is logged in
+   **/
 
-        return await this._doFetch('/login', 'POST', body);
+     static async addToFavorites(body) {
+        return await this._doFetch(`/favorites/`, 'POST', body);
+      }
+
+  /**
+   * Delete favorites with recipe id for user that is logged in
+   **/
+
+  static async deleteFromFavorites(recipeId) {
+    return await this._doFetch(`/favorites/${recipeId}`, 'DELETE');
+  }
+
+  /**
+   * Get favorites for user that is logged in
+   **/
+
+  static async getFavorites() {
+    return await this._doFetch(`/favorites/`);
+  }
+
+  /**
+   * Private method for internal use only
+   **/
+
+  static async _doFetch(url, method = 'GET', body = null) {
+    // Prepare fetch() options
+    let options = {
+      method,
+      headers: {},
+    };
+
+    // Add token to headers if it exists in localStorage
+    let token = Local.getToken();
+    if (token) {
+      options.headers['Authorization'] = 'Bearer ' + token;
     }
 
-    /**
-     * Get all users 
-     **/
-
-    static async getUsers() {
-        return await this._doFetch('/users');
+    // Add the body if one is supplied
+    if (body) {
+      options.headers['Content-Type'] = 'application/json';
+      options.body = JSON.stringify(body);
     }
 
-    /**
-     * Get data for user with ID 'userId'
-     **/
-
-    static async getFavorites() {
-        return await this._doFetch(`/favorites/`);
+    // Do the fetch() and store the results in a "unified" myresponse obj
+    let myresponse = { ok: false, data: null, status: 0, error: '' };
+    try {
+      let response = await fetch(url, options);
+      if (response.ok) {
+        myresponse.ok = true;
+        myresponse.data = await response.json();
+        myresponse.status = response.status;
+      } else {
+        myresponse.status = response.status;
+        myresponse.error = response.statusText;
+      }
+    } catch (err) {
+      myresponse.error = err.message;
     }
 
-    /**
-     * General purpose GET (for URLs like /members-only)
-     **/
-
-    static async getContent(url) {
-        return await this._doFetch(url);
-    }
-
-    /**
-     * Private method for internal use only
-     **/
-
-    static async _doFetch(url, method = 'GET', body = null) {
-        // Prepare fetch() options
-        let options = { 
-            method,
-            headers: {}
-        };
-
-        // Add token to headers if it exists in localStorage
-        let token = Local.getToken();
-        if (token) {
-            options.headers['Authorization'] = 'Bearer ' + token;
-        }
-
-        // Add the body if one is supplied
-        if (body) {
-            options.headers['Content-Type'] = 'application/json';
-            options.body = JSON.stringify(body);
-        }
-
-        // Do the fetch() and store the results in a "unified" myresponse obj
-        let myresponse = { ok: false, data: null, status: 0, error: '' };
-        try {
-            let response = await fetch(url, options);
-            if (response.ok) {
-                myresponse.ok = true;
-                myresponse.data = await response.json();
-                myresponse.status = response.status;
-            } else {
-                myresponse.status = response.status;
-                myresponse.error = response.statusText;
-            }
-        } catch (err) {
-            myresponse.error = err.message;
-        }
-
-        return myresponse;
-    }
-
+    return myresponse;
+  }
 }
 
 export default Api;

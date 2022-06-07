@@ -16,7 +16,6 @@ function ensureUserLoggedIn(req, res, next) {
 
     try {
         // Throws error on invalid/missing token
-        jwt.verify(token, SECRET_KEY);
         let payload = jwt.verify(token, SECRET_KEY);
         res.locals.userId = payload.userId;
         // If we get here, a valid token was passed
@@ -71,3 +70,10 @@ function _getToken(req) {
 
 
 exports.ensureUserLoggedIn = ensureUserLoggedIn;
+/*
+Change
+module.exports = {
+    ensureUserLoggedIn,
+    // ensureSameUser
+};
+*/

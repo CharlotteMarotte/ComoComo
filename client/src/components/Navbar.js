@@ -51,11 +51,11 @@ function Navbar(props) {
             <NavLink to={'/favorites/'}>
               <button
                 className="nav-item btn btn-light .text-nowrap"
-                onClick={(e) => props.getFavoritesCb()}
+                onClick={(e) => props.navigateFavoritesCb()}
                 title="show favorites"
                 type="button"
               >
-                My Favorites 💛
+                {props.user.firstname}'s Favorites 💛
               </button>
             </NavLink>
           </li>

@@ -49,7 +49,6 @@ router.get('/', ensureUserLoggedIn, async function (req, res, next) {
 router.post('/', ensureUserLoggedIn, async (req, res) => {
   let { recipe_id, recipe_title, recipe_img } = req.body;
   let userId = res.locals.userId;
-
   try {
     try {
       let sql_favorites = `

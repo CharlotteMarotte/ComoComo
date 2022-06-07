@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
 
@@ -15,7 +15,6 @@ import Error404View from './views/Error404View';
 import PrivateRoute from './components/PrivateRoute';
 import LoginView from './views/LoginView';
 import SignUpView from './views/SignUpView';
-import UsersView from './views/UsersView';
 
 let BASE_URL = `https://api.spoonacular.com/recipes`;
 const API_KEY = process.env.REACT_APP_MY_API_KEY;
@@ -48,6 +47,11 @@ function App() {
     } catch (err) {
       console.log(`Server error: ${err.message}`);
     }
+  }
+
+  // create function for button in Navbar to use
+  function navigateFavorites() {
+    navigate('/favorites');
   }
 
   async function doLogin(username, password) {
@@ -125,25 +129,20 @@ function App() {
 
   // POST method to add recipe to my sql database ("favorites" sql table) after click on Add to Favorites in the RecipeDetailView
   async function addToFavorites(id) {
+    // create body for API to use
     let myFavRecipe = {
       recipe_id: id,
       recipe_title: recipeInfo.title,
       recipe_img: recipeInfo.image,
     };
 
-    let options = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(myFavRecipe),
-    };
-
     try {
-      let response = await fetch(`/favorites/`, options); //post the new recipe to my favorites ("favories" sql table)
-      if (response.ok) {
+      let myresponse = await Api.addToFavorites(myFavRecipe); //post the new recipe to my favorites ("favorites" sql table)
+      if (myresponse.ok) {
         // when favorite got added navigate to favorites page
         navigate(`/favorites/`);
       } else {
-        console.log(`Server error: ${response.status} ${response.statusText}`);
+        console.log(`Server error: ${myresponse.status} ${myresponse.statusText}`);
       }
     } catch (err) {
       console.log(`Network error: ${err.message}`);
@@ -152,18 +151,14 @@ function App() {
 
   // DELETE method to delete recipe from "favorites" table & "MyFavoritesView" after clicking on Delete in My Favorites (MyFavoritesView)
   async function deleteFromFavorites(recipeId) {
-    let options = {
-      method: 'DELETE',
-    };
-
     try {
-      let response = await fetch(`/favorites/${recipeId}`, options); // delete the recipe with the given id
-      console.log(recipeId, response);
-      if (response.ok) {
-        let favorites = await response.json();
-        // setFavorites(favorites);
+      let myresponse = await Api.deleteFromFavorites(recipeId); // delete the recipe with the given id
+      if (myresponse.ok) {
+        navigate(`/getmeal/`);
       } else {
-        console.log(`Server error: ${response.status} ${response.statusText}`);
+        console.log(
+          `Server error: ${myresponse.status} ${myresponse.statusText}`
+        );
       }
     } catch (err) {
       console.log(`Server error: ${err.message}`);
@@ -172,7 +167,11 @@ function App() {
 
   return (
     <div className="App">
-      <Navbar logoutCb={doLogout} user={user} />
+      <Navbar
+        logoutCb={doLogout}
+        user={user}
+        navigateFavoritesCb={navigateFavorites}
+      />
 
       <div className="container-fluid">
         {/* Routes to other Views of the app */}
@@ -215,9 +214,7 @@ function App() {
             }
           />
           {/* Route to ErrorView in case the users types invalid url */}
-          <Route path="*" element={<Error404View />} />
           <Route path="/" element={<h1>Home</h1>} />
-          <Route path="/users" element={<UsersView />} />
           <Route
             path="/login"
             element={
@@ -228,6 +225,7 @@ function App() {
             }
           />
           <Route path="/signup" element={<SignUpView addUserCb={addUser} />} />
+          <Route path="*" element={<Error404View />} />
         </Routes>
 
         {/* Show error message in case there is a problem with the fetch  */}

@@ -8,6 +8,7 @@ const db = require('../model/helper');
  * Get all users
  **/
 
+
 router.get('/', async function (req, res, next) {
   let sql = 'SELECT * FROM users ORDER BY username';
 
@@ -26,10 +27,8 @@ router.get('/', async function (req, res, next) {
  * A user can only see his/her own favorites.
  **/
 
-router.get(
-  '/:userId',
-  guards.ensureUserLoggedIn,
-  async function (req, res, next) {
+router.get('/:userId', guards.ensureUserLoggedIn,
+async function (req, res, next) {
     let { userId } = req.params;
     let sql = 'SELECT * FROM users WHERE id = ' + userId;
 
