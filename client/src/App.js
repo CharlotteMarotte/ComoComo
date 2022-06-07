@@ -59,6 +59,7 @@ function App() {
       setUser(myresponse.data.user);
       await fetchFavorites();
       setLoginErrorMsg('');
+      setRegisterErrorMsg('');
       navigate('/favorites/');
     } else {
       setLoginErrorMsg('Login failed!');
@@ -67,6 +68,9 @@ function App() {
 
   function doLogout() {
     Local.removeUserInfo();
+    setLoginErrorMsg('');
+    setRegisterErrorMsg('');
+    navigate('/favorites/');
     setUser(null);
   }
 
