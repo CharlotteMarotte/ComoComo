@@ -42,8 +42,8 @@ function RecipeDetail(props) {
           <p>{recipe.servings}</p>
           <h6>Diets:</h6>
           <ul>
-            {recipe.diets.map((d) => (
-              <li key={d.name}>{d}</li>
+            {recipe.diets.map((d, index) => (
+              <li key={index}>{d}</li>
             ))}
           </ul>
           <h6>Ingredients {'&'} Instructions:</h6>{' '}

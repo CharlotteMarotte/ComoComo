@@ -1,4 +1,4 @@
-import React, {useState } from 'react';
+import React, { useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
 
@@ -26,26 +26,24 @@ function App() {
   const [error, setError] = useState('');
   const [user, setUser] = useState(Local.getUser());
   const [loginErrorMsg, setLoginErrorMsg] = useState('');
+  const [registerErrorMsg, setRegisterErrorMsg] = useState('');
 
   // POST method to add recipe to my sql database ("favorites" sql table) after click on Add to Favorites in the RecipeDetailView
   async function addUser(userData) {
-    // Define fetch() options
-    let options = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
-    };
-
-    try {
-      let response = await fetch('/register', options); // do POST
-      if (response.ok) {
-        await response.json();
-        navigate('/login');
-      } else {
-        console.log(`Server error: ${response.status} ${response.statusText}`);
-      }
-    } catch (err) {
-      console.log(`Server error: ${err.message}`);
+    let myresponse = await Api.addUser(userData); // do POST
+    console.log(myresponse);
+    if(myresponse.status === 400){
+      setRegisterErrorMsg('User name is already taken!');
+    }
+    else if (myresponse.ok) {
+      setRegisterErrorMsg('');
+      setLoginErrorMsg('');
+      navigate('/login');
+    } else {
+      console.log(
+        `Server error: ${myresponse.status} ${myresponse.statusText}`
+      );
+      setRegisterErrorMsg('Registration failed!');
     }
   }
 
@@ -59,9 +57,9 @@ function App() {
     if (myresponse.ok) {
       Local.saveUserInfo(myresponse.data.token, myresponse.data.user);
       // setUser is async so use data from myresponse instead
-      navigate('/favorites/');
       setUser(myresponse.data.user);
       setLoginErrorMsg('');
+      navigate('/favorites/');
     } else {
       setLoginErrorMsg('Login failed!');
     }
@@ -142,7 +140,9 @@ function App() {
         // when favorite got added navigate to favorites page
         navigate(`/favorites/`);
       } else {
-        console.log(`Server error: ${myresponse.status} ${myresponse.statusText}`);
+        console.log(
+          `Server error: ${myresponse.status} ${myresponse.statusText}`
+        );
       }
     } catch (err) {
       console.log(`Network error: ${err.message}`);
@@ -224,7 +224,15 @@ function App() {
               />
             }
           />
-          <Route path="/signup" element={<SignUpView addUserCb={addUser} />} />
+          <Route
+            path="/signup"
+            element={
+              <SignUpView
+                addUserCb={addUser}
+                registerError={registerErrorMsg}
+              />
+            }
+          />
           <Route path="*" element={<Error404View />} />
         </Routes>
 

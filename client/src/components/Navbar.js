@@ -42,39 +42,39 @@ function Navbar(props) {
             </NavLink>
           </li>
         </ul>
+        {/* Right-aligned stuff, based on whether user is logged in */}
+        {props.user ? (
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              {/* My Favorites button which leads the user to myfavorites page */}
+              <NavLink to={'/favorites/'}>
+                <button
+                  className="nav-item btn btn-light .text-nowrap"
+                  onClick={(e) => props.navigateFavoritesCb()}
+                  title="show favorites"
+                  type="button"
+                >
+                  {props.user.firstname}'s Favorites 💛
+                </button>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              {/* Log out user. Then go to home page. */}
+              <NavLink className="nav-link" to="/" onClick={props.logoutCb}>
+                Logout
+              </NavLink>
+            </li>
+          </ul>
+        ) : (
+          <ul className="navbar-nav">
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/login">
+                Login
+              </NavLink>
+            </li>
+          </ul>
+        )}
       </div>
-      {/* Right-aligned stuff, based on whether user is logged in */}
-      {props.user ? (
-        <ul className="navbar-nav">
-          <li className="nav-item">
-            {/* My Favorites button which leads the user to myfavorites page */}
-            <NavLink to={'/favorites/'}>
-              <button
-                className="nav-item btn btn-light .text-nowrap"
-                onClick={(e) => props.navigateFavoritesCb()}
-                title="show favorites"
-                type="button"
-              >
-                {props.user.firstname}'s Favorites 💛
-              </button>
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            {/* Log out user. Then go to home page. */}
-            <NavLink className="nav-link" to="/" onClick={props.logoutCb}>
-              Logout
-            </NavLink>
-          </li>
-        </ul>
-      ) : (
-        <ul className="navbar-nav">
-          <li className="nav-item">
-            <NavLink className="nav-link" to="/login">
-              Login
-            </NavLink>
-          </li>
-        </ul>
-      )}
     </nav>
   );
 }

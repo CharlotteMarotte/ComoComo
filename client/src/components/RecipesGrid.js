@@ -28,7 +28,7 @@ function RecipesGrid(props) {
                   <div className="card-footer">
                                 {/* Button See detail is rediredting the user to recipe detail page (calling the function getRecipeInfo) */}
                                 <Link to={'/recipes/'+r.id}>
-                                <button className="btn btn-outline-primary" onClick={(e) => props.getRecipeInfoCb(r.id)}>See detail</button>  
+                                <button className="btn btn-outline-primary" onClick={(e) => props.getRecipeInfoCb(r.id)}>See details</button>  
                                 </Link>
                   
                   </div>

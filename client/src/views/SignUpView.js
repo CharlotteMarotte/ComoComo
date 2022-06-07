@@ -30,6 +30,11 @@ function SignUpView(props) {
 
   return (
     <form className="body-background" onSubmit={handleSubmit}>
+      {props.registerError && (
+        <div className="alert alert-warning text-center">
+          {props.registerError}
+        </div>
+      )}
       <div className="container-fluid d-flex justify-content-center align-items-center h-100">
         <div className="card p-3 text-center py-4">
           <h4>Create account</h4>
@@ -40,6 +45,7 @@ function SignUpView(props) {
 
           <div className="mt-3 px-3">
             <input
+              required
               className="form-control"
               name="username"
               placeholder="Username"
@@ -50,6 +56,7 @@ function SignUpView(props) {
 
           <div className="input-group px-3 mt-3">
             <input
+              required
               type="text"
               className="form-control"
               placeholder="First Name"
@@ -60,6 +67,7 @@ function SignUpView(props) {
             />
             <span></span>
             <input
+              required
               type="text"
               className="form-control"
               name="lastname"
@@ -71,6 +79,7 @@ function SignUpView(props) {
           </div>
           <div className="mt-3 px-3">
             <input
+              required
               className="form-control"
               type="email"
               name="email"
@@ -81,6 +90,7 @@ function SignUpView(props) {
           </div>
           <div className="mt-3 px-3">
             <input
+              required
               className="form-control"
               name="password"
               value={newUserdata.password}

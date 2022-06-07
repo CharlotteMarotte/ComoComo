@@ -14,6 +14,14 @@ import Local from './Local';
 
 class Api {
   /**
+   * Register a user
+   **/
+
+  static async addUser(userData) {
+    return await this._doFetch('/register', 'POST', userData);
+  }
+
+  /**
    * Log in a user
    **/
 
@@ -23,13 +31,13 @@ class Api {
     return await this._doFetch('/login', 'POST', body);
   }
 
-    /**
-   * Add to favoritesfor user that is logged in
+  /**
+   * Add recipe to favorites for user that is logged in
    **/
 
-     static async addToFavorites(body) {
-        return await this._doFetch(`/favorites/`, 'POST', body);
-      }
+  static async addToFavorites(body) {
+    return await this._doFetch(`/favorites/`, 'POST', body);
+  }
 
   /**
    * Delete favorites with recipe id for user that is logged in

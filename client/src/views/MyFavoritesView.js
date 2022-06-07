@@ -41,13 +41,13 @@ function MyFavoritesView(props) {
             key={f.recipe_id}
             className="col-sm-6 col-lg-3 mb-3 d-flex justify-content-evenly"
           >
-            <div className="card ms-2" style={{ width: '22rem' }}>
+            <div className="card ms-2 p-3" style={{ width: '22rem' }}>
               {/* Recipe Image */}
               <img
                 className="card-img-top"
                 id={f.recipe_id}
                 src={f.recipe_img}
-                alt="the meal"
+                alt="boothe meal"
               />
               {/* Recipe title */}
               <div className="card-body">
@@ -60,7 +60,7 @@ function MyFavoritesView(props) {
                     className="btn btn-outline-primary me-3"
                     onClick={(e) => props.getRecipeInfoCb(f.recipe_id)}
                   >
-                    See detail
+                    See details
                   </button>
                 </Link>
                 <button
