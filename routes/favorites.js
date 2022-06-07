@@ -85,6 +85,22 @@ router.post('/', ensureUserLoggedIn, async (req, res) => {
   }
 });
 
+
+// GET all favorites ordered by date and time posted, ascending order
+router.get('/likes/:recipe_id', async function (req, res) {
+  let recipe_id = req.params.recipe_id;
+  let sql = `SELECT COUNT(fk_usersId) AS timesFavorited FROM users_favorites WHERE fk_favoritesId = ${recipe_id};`;
+  try {
+    let result = await db(sql);
+    result = result.data;
+    res.send(result);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+
+
+
 router.delete('/:recipe_id', ensureUserLoggedIn, async (req, res) => {
   let recipe_id = req.params.recipe_id;
   let userId = res.locals.userId;

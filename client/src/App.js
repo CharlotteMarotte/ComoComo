@@ -28,6 +28,7 @@ function App() {
   const [loginErrorMsg, setLoginErrorMsg] = useState('');
   const [registerErrorMsg, setRegisterErrorMsg] = useState('');
   const [favoritesErrorMsg, setFavoritesErrorMsg] = useState('');
+  const [favoritedRecipes, setFavoritedRecipes] = useState(null);
 
   // POST method to add recipe to my sql database ("favorites" sql table) after click on Add to Favorites in the RecipeDetailView
   async function addUser(userData) {
@@ -57,10 +58,10 @@ function App() {
       Local.saveUserInfo(myresponse.data.token, myresponse.data.user);
       // setUser is async so use data from myresponse instead
       setUser(myresponse.data.user);
-      await fetchFavorites();
+      await fetchFavorites(); // get favorites of users and save in state
       setLoginErrorMsg('');
       setRegisterErrorMsg('');
-      navigate('/favorites/');
+      navigate('/favorites/'); // go to user's favorites
     } else {
       setLoginErrorMsg('Login failed!');
     }
@@ -72,6 +73,21 @@ function App() {
     setRegisterErrorMsg('');
     navigate('/favorites/');
     setUser(null);
+  }
+
+  async function getTimesFavorites() {
+    let arrOfIds = [];
+    let timesFavoritedObj = {};
+    recipes.forEach((e) => arrOfIds.push(e.id));
+    for (let id of arrOfIds) {
+      let result = await Api.getTimesFavorites(id);
+      await getRecipeInfo(id);
+      timesFavoritedObj[id] = {
+        DB: result.data[0].timesFavorited,
+        API: recipeInfo.aggregateLikes, // this doesn't work, it's always the same
+      };
+    }
+    setFavoritedRecipes(timesFavoritedObj);
   }
 
   // calling Spoonacular API to get recipes based on ingredients from input
@@ -93,6 +109,7 @@ function App() {
       if (response.ok) {
         let data = await response.json();
         setRecipes(data);
+        await getTimesFavorites(); // get to all recipes number of times this recipe has been saved in DB
       } else {
         setError(`Server error: ${response.status} ${response.statusText}`);
       }
@@ -204,7 +221,7 @@ function App() {
           <Route
             path="recipes"
             element={
-              <GridView recipes={recipes} getRecipeInfoCb={getRecipeInfo} />
+              <GridView recipes={recipes} getRecipeInfoCb={getRecipeInfo} favoritedRecipes={favoritedRecipes}/>
             }
           />
           {/* Route to RecipeDetailView with the RecipeDetail component*/}

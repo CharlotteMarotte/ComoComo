@@ -2,10 +2,7 @@ import { Link } from 'react-router-dom';
 import React, { useEffect } from 'react';
 
 function MyFavoritesView(props) {
- 
-  useEffect(() => {
-  }, []);
-
+  useEffect(() => {}, []);
 
   if (props.favoritesErrorMsg) {
     return <h2 style={{ color: 'red' }}>{props.favoritesErrorMsg}</h2>;
@@ -18,11 +15,13 @@ function MyFavoritesView(props) {
   return (
     <div className="MyFavoritesView">
       <div className="row">
-       <h2>My favorites</h2>
+        <h2>My favorites</h2>
         {/* Grid with recipe cards */}(
-        {props.user.favorites.map((f) =>
+        {props.user.favorites.map((f, index) =>
           f.recipe_id === null ? (
-            <h2 style={{ color: 'red' }}>No favorites yet.</h2>
+            <h2 style={{ color: 'red' }} key={index}>
+              No favorites yet.
+            </h2>
           ) : (
             <div
               key={f.recipe_id}

@@ -16,7 +16,6 @@ function RecipeDetail(props) {
         <div className="col text-center">
           {/* Recipe image */}
           <img src={recipe.image} alt="the meal" />
-          <p></p>
           {
             //  Button Add to favorites - after click it calls the addToFavorites function which is adding the recipe to
             //  My Favorites page (the database ("favorites" table)); click is also causing redirection to /myfavorites page

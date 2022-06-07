@@ -55,6 +55,14 @@ class Api {
     return await this._doFetch(`/favorites/`);
   }
 
+    /**
+   * Get times that recipe has been favorited 
+   **/
+
+     static async getTimesFavorites(recipe_id) {
+      return await this._doFetch(`/favorites/likes/${recipe_id}`);
+    }
+
   /**
    * Private method for internal use only
    **/
