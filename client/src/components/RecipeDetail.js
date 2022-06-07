@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './RecipeDetail.css';
 import { Link } from 'react-router-dom';
 import Error404View from '../views/Error404View';
 
 function RecipeDetail(props) {
+  useEffect(() => {}, []);
+
   let recipe = props.recipeInfo;
 
   return (
@@ -18,16 +20,21 @@ function RecipeDetail(props) {
           {
             //  Button Add to favorites - after click it calls the addToFavorites function which is adding the recipe to
             //  My Favorites page (the database ("favorites" table)); click is also causing redirection to /myfavorites page
-            props.user && (
-              <button
-                type="button"
-                className="btn btn-light"
-                onClick={(e) => props.addToFavoritesCb(recipe.id)}
-                title="Add to favorites"
-              >
-                Add to Favorites💛
-              </button>
-            )
+            props.user && props.user.favorites && 
+            // checks if this user already is connected to this recipe in users_favorites table
+              (props.user.favorites.filter((e) => e.recipe_id === recipe.id)
+                .length !== 0 ? (
+                <h2>Already in favorites</h2>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-light"
+                  onClick={(e) => props.addToFavoritesCb(recipe.id)}
+                  title="Add to favorites"
+                >
+                  Add to Favorites💛
+                </button>
+              ))
           }
           <p></p>
           <Link to="/recipes">Go to all recipes</Link>

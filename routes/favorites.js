@@ -85,7 +85,6 @@ router.post('/', ensureUserLoggedIn, async (req, res) => {
   }
 });
 
-//DELETE recipe from favorites table
 router.delete('/:recipe_id', ensureUserLoggedIn, async (req, res) => {
   let recipe_id = req.params.recipe_id;
   let userId = res.locals.userId;
@@ -93,9 +92,14 @@ router.delete('/:recipe_id', ensureUserLoggedIn, async (req, res) => {
     await db(
       `DELETE FROM users_favorites WHERE fk_favoritesId = ${recipe_id} AND fk_usersId = ${userId};`
     ); // delete recipe
+
+    // // deletes all entries from favorites than are not connected to a user via user_favorites table anymore
+    await db(`DELETE FROM favorites WHERE NOT EXISTS (SELECT * FROM users_favorites WHERE users_favorites.fk_favoritesId = favorites.recipe_id);
+    `);
+
     result =
       await db(`SELECT f.*, u.*, fu.notes, fu.posted FROM users AS u LEFT OUTER JOIN users_favorites AS fu on u.id = fu.fk_usersId 
-    LEFT OUTER JOIN favorites AS f ON fu.fk_favoritesId = f.recipe_id WHERE u.id = ${userId};`); //get all favorites ordered by date and time posted, ascending order
+    LEFT OUTER JOIN favorites AS f ON fu.fk_favoritesId = f.recipe_id WHERE u.id = ${userId} ORDER BY fu.posted ASC;`); //get all favorites ordered by date and time posted, ascending order
     let favorites = result.data;
     favorites = await joinFavoritestoJson(favorites); //get all favorites ordered by date and time posted, ascending order
     res.send(favorites); // return updated array

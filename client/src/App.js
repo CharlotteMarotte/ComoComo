@@ -27,15 +27,14 @@ function App() {
   const [user, setUser] = useState(Local.getUser());
   const [loginErrorMsg, setLoginErrorMsg] = useState('');
   const [registerErrorMsg, setRegisterErrorMsg] = useState('');
+  const [favoritesErrorMsg, setFavoritesErrorMsg] = useState('');
 
   // POST method to add recipe to my sql database ("favorites" sql table) after click on Add to Favorites in the RecipeDetailView
   async function addUser(userData) {
     let myresponse = await Api.addUser(userData); // do POST
-    console.log(myresponse);
-    if(myresponse.status === 400){
+    if (myresponse.status === 400) {
       setRegisterErrorMsg('User name is already taken!');
-    }
-    else if (myresponse.ok) {
+    } else if (myresponse.ok) {
       setRegisterErrorMsg('');
       setLoginErrorMsg('');
       navigate('/login');
@@ -58,6 +57,7 @@ function App() {
       Local.saveUserInfo(myresponse.data.token, myresponse.data.user);
       // setUser is async so use data from myresponse instead
       setUser(myresponse.data.user);
+      await fetchFavorites();
       setLoginErrorMsg('');
       navigate('/favorites/');
     } else {
@@ -139,6 +139,7 @@ function App() {
       if (myresponse.ok) {
         // when favorite got added navigate to favorites page
         navigate(`/favorites/`);
+        setUser(myresponse.data);
       } else {
         console.log(
           `Server error: ${myresponse.status} ${myresponse.statusText}`
@@ -154,7 +155,7 @@ function App() {
     try {
       let myresponse = await Api.deleteFromFavorites(recipeId); // delete the recipe with the given id
       if (myresponse.ok) {
-        navigate(`/getmeal/`);
+        setUser(myresponse.data);
       } else {
         console.log(
           `Server error: ${myresponse.status} ${myresponse.statusText}`
@@ -162,6 +163,18 @@ function App() {
       }
     } catch (err) {
       console.log(`Server error: ${err.message}`);
+    }
+  }
+
+  async function fetchFavorites() {
+    let myresponse = await Api.getFavorites();
+    if (myresponse.ok) {
+      setUser(myresponse.data);
+      setFavoritesErrorMsg('');
+    } else {
+      setUser(null);
+      let favoritesMsg = `Error ${myresponse.status}: ${myresponse.error}`;
+      setFavoritesErrorMsg(favoritesMsg);
     }
   }
 
@@ -209,6 +222,8 @@ function App() {
                 <MyFavoritesView
                   deleteFromFavoritesCb={deleteFromFavorites}
                   getRecipeInfoCb={getRecipeInfo}
+                  user={user}
+                  favoritesErrorMsg={favoritesErrorMsg}
                 />
               </PrivateRoute>
             }
