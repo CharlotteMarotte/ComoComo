@@ -9,6 +9,7 @@ function RecipeDetailView(props) {
           recipeInfo={props.recipeInfo}
           addToFavoritesCb={props.addToFavoritesCb}
           user={props.user}
+          favoritedRecipes={props.favoritedRecipes}
         />
       )}
     </div>

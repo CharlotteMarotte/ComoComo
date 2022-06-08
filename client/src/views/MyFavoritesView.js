@@ -16,7 +16,7 @@ function MyFavoritesView(props) {
     <div className="MyFavoritesView">
       <div className="row">
         <h2>My favorites</h2>
-        {/* Grid with recipe cards */}(
+        {/* Grid with recipe cards */}
         {props.user.favorites.map((f, index) =>
           f.recipe_id === null ? (
             <h2 style={{ color: 'red' }} key={index}>
@@ -27,6 +27,7 @@ function MyFavoritesView(props) {
               key={f.recipe_id}
               className="col-sm-6 col-lg-3 mb-3 d-flex justify-content-evenly"
             >
+              {/* in first row only three favorites are shown next to each other */}
               <div className="card ms-2 p-3" style={{ width: '22rem' }}>
                 {/* Recipe Image */}
                 <img

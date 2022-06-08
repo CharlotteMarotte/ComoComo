@@ -13,7 +13,10 @@ function RecipesGrid(props) {
             className="col-sm-6 col-lg-3 mb-3 d-flex justify-content-evenly"
             key={r.id}
           >
-            <div className="card ms-2 text-center" style={{ width: '25rem' }}>
+            <div
+              className="card ms-2 text-center p-3"
+              style={{ width: '25rem' }}
+            >
               {/* Image of the recipe */}
               <img
                 className="card-img-top"
@@ -34,9 +37,16 @@ function RecipesGrid(props) {
                 </p>
               </div>
               <div className="card-footer">
-                {/* id doesn't match the one from timesFavorited obj state */}
-                <p className="d-inline">In App: {r.id} 💜{' '}</p>
-                <p className="d-inline">Total: 💚{' '}</p>
+                {props.favoritedRecipes[r.id] && (
+                  <>
+                    <p className="d-inline">
+                      In App: {props.favoritedRecipes[r.id].DB} 💜{' '}
+                    </p>
+                    <p className="d-inline">
+                      Total: {props.favoritedRecipes[r.id].API} 💚{' '}
+                    </p>
+                  </>
+                )}
                 {/* Button See detail is rediredting the user to recipe detail page (calling the function getRecipeInfo) */}
                 <Link to={'/recipes/' + r.id}>
                   <button

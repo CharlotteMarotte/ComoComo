@@ -1,9 +1,13 @@
 .App {
   font-family: 'Montserrat';
 }
-.container-fluid {
+
+body {
   background-color: rgb(227, 212, 216);
-  min-height: 600px;
+}
+
+.Comonavbar{
+  background-color: white;
 }
 
 p {

@@ -4,7 +4,7 @@ import './Navbar.css';
 
 function Navbar(props) {
   return (
-    <nav className="navbar navbar-expand-sm navbar-light">
+    <nav className="Comonavbar navbar navbar-expand-sm navbar-light">
       {/* "Logo" */}
       <a className="navbar-brand" href="/">
         ¿Cómo Como?

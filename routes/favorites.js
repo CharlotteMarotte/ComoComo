@@ -15,6 +15,7 @@ async function joinFavoritestoJson(users) {
     recipe_title: f.recipe_title,
     recipe_img: f.recipe_img,
     posted: f.posted,
+    notes: f.notes
   }));
 
   // Create author obj
@@ -34,7 +35,7 @@ async function joinFavoritestoJson(users) {
 router.get('/', ensureUserLoggedIn, async function (req, res, next) {
   let userId = res.locals.userId;
   let sql = `SELECT f.*, u.*, fu.notes, fu.posted FROM users AS u LEFT OUTER JOIN users_favorites AS fu on u.id = fu.fk_usersId 
-    LEFT OUTER JOIN favorites AS f ON fu.fk_favoritesId = f.recipe_id WHERE u.id = ${userId};`;
+    LEFT OUTER JOIN favorites AS f ON fu.fk_favoritesId = f.recipe_id WHERE u.id = ${userId} ORDER BY fu.posted ASC;`;
   try {
     let results = await db(sql); // get all favorite recipes
     let favorites = results.data;
@@ -47,7 +48,7 @@ router.get('/', ensureUserLoggedIn, async function (req, res, next) {
 
 // POST recipe in favorites table and connect it to current users' favorites
 router.post('/', ensureUserLoggedIn, async (req, res) => {
-  let { recipe_id, recipe_title, recipe_img } = req.body;
+  let { recipe_id, recipe_title, recipe_img, notes } = req.body;
   let userId = res.locals.userId;
   try {
     try {
@@ -69,14 +70,14 @@ router.post('/', ensureUserLoggedIn, async (req, res) => {
       return;
     }
 
-    let sql_junction = `INSERT INTO users_favorites (fk_usersId, fk_favoritesId) 
-    VALUES (${userId}, ${recipe_id});`;
+    let sql_junction = `INSERT INTO users_favorites (fk_usersId, fk_favoritesId, notes) 
+    VALUES (${userId}, ${recipe_id}, '${notes}');`;
 
     await db(sql_junction); // add new recipe
     // gets all favorites of this user in a formatted json format
     let result =
       await db(`SELECT f.*, u.*, fu.notes, fu.posted FROM users AS u LEFT OUTER JOIN users_favorites AS fu on u.id = fu.fk_usersId 
-      LEFT OUTER JOIN favorites AS f ON fu.fk_favoritesId = f.recipe_id WHERE u.id = ${userId};`);
+      LEFT OUTER JOIN favorites AS f ON fu.fk_favoritesId = f.recipe_id WHERE u.id = ${userId} ORDER BY fu.posted ASC;`);
     let favorites = result.data;
     favorites = await joinFavoritestoJson(favorites); //get all favorites ordered by date and time posted, ascending order
     res.status(201).send(favorites); // return updated array (with 201 for "new resource created")

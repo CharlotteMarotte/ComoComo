@@ -57,7 +57,6 @@ function App() {
     if (myresponse.ok) {
       Local.saveUserInfo(myresponse.data.token, myresponse.data.user);
       // setUser is async so use data from myresponse instead
-      setUser(myresponse.data.user);
       await fetchFavorites(); // get favorites of users and save in state
       setLoginErrorMsg('');
       setRegisterErrorMsg('');
@@ -75,16 +74,16 @@ function App() {
     setUser(null);
   }
 
-  async function getTimesFavorites() {
+  async function getTimesFavorites(data) {
     let arrOfIds = [];
     let timesFavoritedObj = {};
-    recipes.forEach((e) => arrOfIds.push(e.id));
+    data.forEach((e) => arrOfIds.push(e.id));
     for (let id of arrOfIds) {
       let result = await Api.getTimesFavorites(id);
-      await getRecipeInfo(id);
+      let resultAPI = await getRecipeInfo(id);
       timesFavoritedObj[id] = {
         DB: result.data[0].timesFavorited,
-        API: recipeInfo.aggregateLikes, // this doesn't work, it's always the same
+        API: resultAPI.aggregateLikes, // this doesn't work, it's always the same
       };
     }
     setFavoritedRecipes(timesFavoritedObj);
@@ -109,7 +108,7 @@ function App() {
       if (response.ok) {
         let data = await response.json();
         setRecipes(data);
-        await getTimesFavorites(); // get to all recipes number of times this recipe has been saved in DB
+        await getTimesFavorites(data); // get to all recipes number of times this recipe has been saved in DB
       } else {
         setError(`Server error: ${response.status} ${response.statusText}`);
       }
@@ -138,19 +137,23 @@ function App() {
       if (response.ok) {
         let data = await response.json();
         setRecipeInfo(data);
+        return data;
       } else {
         setError(`Server error: ${response.status} ${response.statusText}`);
+        return null;
       }
     } catch (err) {
       setError(`Network error: ${err.message}`);
+      return null;
     }
   }
 
   // POST method to add recipe to my sql database ("favorites" sql table) after click on Add to Favorites in the RecipeDetailView
-  async function addToFavorites(id) {
+  async function addToFavorites(id, notes) {
     // create body for API to use
     let myFavRecipe = {
       recipe_id: id,
+      notes: notes,
       recipe_title: recipeInfo.title,
       recipe_img: recipeInfo.image,
     };
@@ -187,6 +190,7 @@ function App() {
     }
   }
 
+  // helper function that gets called on login and gets favorites for the user that is currently logged in
   async function fetchFavorites() {
     let myresponse = await Api.getFavorites();
     if (myresponse.ok) {
@@ -232,6 +236,7 @@ function App() {
                 recipeInfo={recipeInfo}
                 user={user}
                 addToFavoritesCb={addToFavorites}
+                favoritedRecipes={favoritedRecipes}
               />
             }
           />

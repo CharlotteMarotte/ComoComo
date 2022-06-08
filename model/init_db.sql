@@ -80,8 +80,8 @@ VALUES
     );
 
 INSERT INTO
-    users_favorites (fk_usersId, fk_favoritesId)
+    users_favorites (fk_usersId, fk_favoritesId, notes)
 VALUES
-    (1, 661447),
-    (1, 640513),
-    (2, 640513);
+    (1, 661447, "Maybe for christmas?"),
+    (1, 640513, "Mum would like this"),
+    (2, 640513, "Like in my childhood!");
