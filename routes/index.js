@@ -9,17 +9,10 @@ const db = require("../model/helper");
  **/
 
 router.get('/', function(req, res) {
-    res.send({ message: 'Welcome to the AuthAuth homepage! Try /users' });
+    res.send({ message: 'Welcome to the AuthAuth homepage!' });
 });
 
 
-/**
- * GET /members-only
- **/
-
-router.get('/members-only', ensureUserLoggedIn, function(req, res) {
-    res.send({ message: 'Here is your Members Only content from the server...' });
-});
 
 
 module.exports = router;

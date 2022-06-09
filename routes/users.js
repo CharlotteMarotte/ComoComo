@@ -22,29 +22,5 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-/**
- * Get one user and the connected favorites.
- * A user can only see his/her own favorites.
- **/
-
-router.get('/:userId', guards.ensureUserLoggedIn,
-async function (req, res, next) {
-    let { userId } = req.params;
-    let sql = 'SELECT * FROM users WHERE id = ' + userId;
-
-    try {
-      let results = await db(sql);
-      // We know user exists because he/she is logged in!
-      let user = results.data;
-      res.send(user);
-    } catch (err) {
-      res.status(500).send({ error: err.message });
-    }
-  }
-);
-
-/**
- * Add a new user.
- **/
 
 module.exports = router;

@@ -20,9 +20,10 @@ let BASE_URL = `https://api.spoonacular.com/recipes`;
 const API_KEY = process.env.REACT_APP_MY_API_KEY;
 
 function App() {
+  const navigate = useNavigate();
+
   const [recipes, setRecipes] = useState([]);
   const [recipeInfo, setRecipeInfo] = useState(null);
-  const navigate = useNavigate();
   const [error, setError] = useState('');
   const [user, setUser] = useState(Local.getUser());
   const [loginErrorMsg, setLoginErrorMsg] = useState('');
@@ -89,6 +90,36 @@ function App() {
     setFavoritedRecipes(timesFavoritedObj);
   }
 
+  // calling Spoonacular API to get random recipe
+  async function getRandomRecipe() {
+    let id = 0;
+
+    setError('');
+    setRecipes(null);
+
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    let url = `${BASE_URL}/random?number=1&apiKey=${API_KEY}`;
+    try {
+      let response = await fetch(url, options);
+      if (response.ok) {
+        let data = await response.json();
+        id = data.recipes[0].id;
+        await getRecipeInfo(id);
+        await getTimesFavorites(data.recipes); // get to all recipes number of times this recipe has been saved in DB
+      } else {
+        setError(`Server error: ${response.status} ${response.statusText}`);
+      }
+    } catch (err) {
+      setError(`Network error: ${err.message}`);
+    }
+    navigate(`/recipes/${id}`); // redirect to /recipes
+  }
+
   // calling Spoonacular API to get recipes based on ingredients from input
   async function getRecipes(ingredients) {
     setError('');
@@ -101,7 +132,7 @@ function App() {
       },
     };
 
-    let url = `${BASE_URL}/findByIngredients?apiKey=${API_KEY}&ingredients=${ingredients}&number=5&ranking=1&ignorePantry=true`;
+    let url = `${BASE_URL}/findByIngredients?apiKey=${API_KEY}&ingredients=${ingredients}&number=8&ranking=1&ignorePantry=true`;
 
     try {
       let response = await fetch(url, options);
@@ -209,8 +240,8 @@ function App() {
         logoutCb={doLogout}
         user={user}
         navigateFavoritesCb={navigateFavorites}
+        getRandomRecipeCb={getRandomRecipe}
       />
-
       <div className="container-fluid">
         {/* Routes to other Views of the app */}
         <Routes>
@@ -221,11 +252,16 @@ function App() {
             path="getmeal"
             element={<GetMealView getRecipesCb={getRecipes} />}
           />
+
           {/* Route to GridView with the RecipesGrid component*/}
           <Route
             path="recipes"
             element={
-              <GridView recipes={recipes} getRecipeInfoCb={getRecipeInfo} favoritedRecipes={favoritedRecipes}/>
+              <GridView
+                recipes={recipes}
+                getRecipeInfoCb={getRecipeInfo}
+                favoritedRecipes={favoritedRecipes}
+              />
             }
           />
           {/* Route to RecipeDetailView with the RecipeDetail component*/}

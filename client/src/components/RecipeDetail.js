@@ -8,7 +8,9 @@ function RecipeDetail(props) {
   let recipe = props.recipeInfo;
 
   useEffect(() => {
-    getInfoForFavorite();
+    if (props.user) {
+      getInfoForFavorite();
+    }
   }, []);
 
   // gets called every time a radio button element is selected

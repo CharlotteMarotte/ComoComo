@@ -39,7 +39,6 @@ CREATE TABLE users_favorites (
 --
 -- Insert sample/seed data
 --
--- user1 has password pass1 (etc)
 INSERT INTO
     favorites (recipe_id, recipe_title, recipe_img)
 VALUES
@@ -54,6 +53,7 @@ VALUES
         'https://spoonacular.com/recipeImages/640513-312x231.jpg'
     );
 
+-- user1 has password pass1 (etc)
 INSERT INTO
     users (username, firstname, lastname, password, email)
 VALUES

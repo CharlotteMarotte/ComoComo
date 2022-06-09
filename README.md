@@ -1,6 +1,6 @@
 # Full Stack "Como Como" App
 
-Como Como is a full stack app that generates recipes based on the user’s input (ingredients) by calling Spoonacular API and with the option to save recipes to Como Como database (favorites table). It is using external API (Spoonacular), React, Node/Express, MySQL, and Boostrap with CSS.
+Como Como is a full stack app that generates recipes based on the user’s input (ingredients) by calling Spoonacular API and with the option to save recipes to Como Como database (favorites table). It is using external API (Spoonacular), React, Node/Express, MySQL, Boostrap with CSS, JWT and BCrypt for the user authentication.
 
 See project description (<https://docs.google.com/document/d/1ZEqWVentlgWaSKaJFuX3xj2hFh_qfXxy4Dz4CYT-aSg/edit?usp=sharing>) for the following information:
 
@@ -60,6 +60,9 @@ Run `yarn migrate` in your terminal in the project folder in order to create `fa
 - [MySQL](https://dev.mysql.com/doc/refman/8.0/en/database-use.html)
 - [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 - [React Documentation](https://reactjs.org/docs/hello-world.html)
+- [JWT](https://jwt.io/introduction/)
+- [BCrypt](https://openbase.com/js/bcrypt/documentation)
+- [Dotenv](https://openbase.com/js/dotenv/documentation)
 
 ## Notes
 

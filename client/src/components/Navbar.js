@@ -34,6 +34,17 @@ function Navbar(props) {
             </NavLink>
           </li>
           <li className="nav-item">
+            {/* on click calls method to get random recipe */}
+            <button
+              className="nav-item btn btn-light .text-nowrap"
+              onClick={(e) => props.getRandomRecipeCb()}
+              title="Get random recipe"
+              type="button"
+            >
+              Random recipe
+            </button>
+          </li>
+          <li className="nav-item">
             <NavLink
               to="/getmeal"
               style={{ color: 'black', textDecoration: 'none' }}
